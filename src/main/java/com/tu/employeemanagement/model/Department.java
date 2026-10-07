@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Builder
 @Entity
 @Table(name = "departments")
 @NoArgsConstructor
@@ -21,6 +22,7 @@ public class Department {
     @Column(name = "name", nullable = false, unique = true, length = 30)
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "department")
     private Set<Employee> employees = new HashSet<>();
 

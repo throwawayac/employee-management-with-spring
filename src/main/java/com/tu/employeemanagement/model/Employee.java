@@ -3,6 +3,7 @@ package com.tu.employeemanagement.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Builder
 @Entity
 @Table(name = "employees")
 @NoArgsConstructor
