@@ -14,4 +14,9 @@ public class DepartmentDto {
     @NotBlank(message = "Department name is required")
     @Size(min = 3, max = 30, message = "Department name must be between 3 and 30 characters")
     private String name;
+
+    
+    private java.util.Set<EmployeeDto> employees;
+
+    private boolean isDeleted;
 }

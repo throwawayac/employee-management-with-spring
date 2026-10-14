@@ -32,4 +32,6 @@ public class EmployeeDto {
 
     @NotNull(message = "Department is required")
     private Long departmentId;
+
+    private boolean isDeleted;
 }

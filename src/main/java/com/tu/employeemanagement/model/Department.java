@@ -23,7 +23,11 @@ public class Department {
     private String name;
 
     @Builder.Default
-    @OneToMany(mappedBy = "department")
+    @OneToMany(mappedBy = "department", orphanRemoval = true)
     private Set<Employee> employees = new HashSet<>();
+
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
 }
