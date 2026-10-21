@@ -76,7 +76,8 @@ public class DepartmentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         Department department = findDepartment(id);
-        if (employeeRepository.existsByDepartmentId(id)) {
+        // soft-deleted employees don't count, so a department whose employees are all soft-deleted can be deleted
+        if (employeeRepository.existsByDepartmentIdAndIsDeletedFalse(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Department still has employees");
         }
 

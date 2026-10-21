@@ -6,9 +6,10 @@ import org.mapstruct.Mapping;
 import com.tu.employeemanagement.dto.DepartmentDto;
 import com.tu.employeemanagement.model.Department;
 
-@Mapper(uses = EmployeeMapper.class) // department.employees -> EmployeeDto via EmployeeMapper.toDto (keeps departmentId)
+@Mapper(uses = EmployeeMapper.class) // lets this mapper call EmployeeMapper's methods for department.employees
 public interface DepartmentMapper {
 
+    @Mapping(target = "employees", qualifiedByName = "activeEmployees") // EmployeeMapper.toActiveDtos: soft-deleted employees are left out
     DepartmentDto toDto(Department department);
 
     @Mapping(target = "employees", ignore = true) // employees are linked from the Employee side
