@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 @Repository 
 public class ExampleRepository {
 
+    @Deprecated
     public String getExampleData() {
         // This is a placeholder method to demonstrate the repository structure.
         // Hibernate and Spring Data JPA will handle the actual data retrieval in a real implementation.
