@@ -2,13 +2,14 @@ package com.tu.employeemanagement.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.tu.employeemanagement.dto.DepartmentDto;
+import com.tu.employeemanagement.exception.ConflictException;
+import com.tu.employeemanagement.exception.ResourceNotFoundException;
 import com.tu.employeemanagement.mapper.DepartmentMapper;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.ExceptionMessages;
 import com.tu.employeemanagement.model.Department;
 import com.tu.employeemanagement.repository.DepartmentRepository;
 import com.tu.employeemanagement.repository.EmployeeRepository;
@@ -45,7 +46,7 @@ public class DepartmentService {
     public DepartmentDto create(DepartmentDto dto) {
         // also counts soft-deleted departments: their names are still in the table's UNIQUE column
         if (departmentRepository.existsByName(dto.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name is already in use");
+            throw new ConflictException(ExceptionMessages.DEPARTMENT_NAME_IN_USE);
         }
 
         Department department = departmentMapper.toEntity(dto);
@@ -57,7 +58,7 @@ public class DepartmentService {
         Department department = findDepartment(id);
         // only check a changed name, otherwise the department's own name would count as a duplicate
         if (!dto.getName().equals(department.getName()) && departmentRepository.existsByName(dto.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name is already in use");
+            throw new ConflictException(ExceptionMessages.DEPARTMENT_NAME_IN_USE);
         }
 
         // change the loaded department instead of saving a new one built by the mapper: that one would have an
@@ -70,7 +71,7 @@ public class DepartmentService {
         Department department = findDepartment(id);
         // soft-deleted employees don't count, so a department whose employees are all soft-deleted can be deleted
         if (employeeRepository.existsByDepartmentIdAndIsDeletedFalse(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Department still has employees");
+            throw new ConflictException(ExceptionMessages.DEPARTMENT_HAS_EMPLOYEES);
         }
 
         department.setDeleted(true);
@@ -80,10 +81,10 @@ public class DepartmentService {
     @Deprecated // use delete(); this removes the row for good
     public void hardDelete(Long id) {
         Department department = departmentRepository.findById(id) // also finds soft-deleted departments
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessages.DEPARTMENT_NOT_FOUND.formatted(id)));
         // orphanRemoval = true would delete the department's employees along with it, so refuse instead
         if (employeeRepository.existsByDepartmentId(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Department still has employees");
+            throw new ConflictException(ExceptionMessages.DEPARTMENT_HAS_EMPLOYEES);
         }
 
         departmentRepository.delete(department);
@@ -94,7 +95,7 @@ public class DepartmentService {
     public Department findDepartment(Long id) {
         return departmentRepository.findById(id)
                 .filter(department -> !department.isDeleted())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessages.DEPARTMENT_NOT_FOUND.formatted(id)));
     }
 
 }

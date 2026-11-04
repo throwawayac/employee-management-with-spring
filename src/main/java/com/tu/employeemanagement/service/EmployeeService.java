@@ -2,13 +2,14 @@ package com.tu.employeemanagement.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.tu.employeemanagement.dto.EmployeeDto;
+import com.tu.employeemanagement.exception.ConflictException;
+import com.tu.employeemanagement.exception.ResourceNotFoundException;
 import com.tu.employeemanagement.mapper.EmployeeMapper;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.ExceptionMessages;
 import com.tu.employeemanagement.model.Department;
 import com.tu.employeemanagement.model.Employee;
 import com.tu.employeemanagement.repository.EmployeeRepository;
@@ -38,11 +39,11 @@ public class EmployeeService {
     public EmployeeDto create(EmployeeDto dto) {
         // also counts soft-deleted employees: their email and phone number are still in the table's UNIQUE columns
         if (employeeRepository.existsByEmail(dto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee email is already in use");
+            throw new ConflictException(ExceptionMessages.EMPLOYEE_EMAIL_IN_USE);
         }
         // the phone number is optional, and existsByPhoneNumber(null) would match every employee without one
         if (dto.getPhoneNumber() != null && employeeRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee phone number is already in use");
+            throw new ConflictException(ExceptionMessages.EMPLOYEE_PHONE_NUMBER_IN_USE);
         }
 
         Employee employee = employeeMapper.toEntity(dto);
@@ -55,11 +56,11 @@ public class EmployeeService {
         Employee employee = findEmployee(id);
         // only check values that changed, otherwise the employee's own email/phone number would count as a duplicate
         if (!dto.getEmail().equals(employee.getEmail()) && employeeRepository.existsByEmail(dto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee email is already in use");
+            throw new ConflictException(ExceptionMessages.EMPLOYEE_EMAIL_IN_USE);
         }
         if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().equals(employee.getPhoneNumber())
                 && employeeRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee phone number is already in use");
+            throw new ConflictException(ExceptionMessages.EMPLOYEE_PHONE_NUMBER_IN_USE);
         }
         Department department = departmentService.findDepartment(dto.getDepartmentId());
 
@@ -87,7 +88,7 @@ public class EmployeeService {
     private Employee findEmployee(Long id) {
         return employeeRepository.findById(id)
                 .filter(employee -> !employee.isDeleted())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessages.EMPLOYEE_NOT_FOUND.formatted(id)));
     }
 
 }

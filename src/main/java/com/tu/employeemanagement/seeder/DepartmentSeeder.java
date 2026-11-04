@@ -6,6 +6,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.LogMessages;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.SeedDepartments;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.SeederOrder;
 import com.tu.employeemanagement.model.Department;
 import com.tu.employeemanagement.repository.DepartmentRepository;
 
@@ -15,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j // for cleaner logging messages to the console during seeding
 @Component
 @RequiredArgsConstructor
-@Order(1) // must run before EmployeeSeeder, which looks these departments up by name
+@Order(SeederOrder.DEPARTMENTS) // must run before EmployeeSeeder, which looks these departments up by name
 public class DepartmentSeeder implements CommandLineRunner {
 
     private final DepartmentRepository departmentRepository;
@@ -24,31 +27,31 @@ public class DepartmentSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         if (departmentRepository.count() > 0) {
-            log.info("Departments already exist. Skipping seeding.");
+            log.info(LogMessages.DEPARTMENTS_ALREADY_EXIST);
             return;
         }
 
-        // names must pass DepartmentDto validation (3-30 characters)
+        // names must pass DepartmentDto validation (DEPARTMENT_NAME_MIN_LENGTH to DEPARTMENT_NAME_MAX_LENGTH characters)
         Department hr = Department.builder()
-                .name("Human Resources")
+                .name(SeedDepartments.HUMAN_RESOURCES)
                 .build();
 
         Department it = Department.builder()
-                .name("Information Technology")
+                .name(SeedDepartments.INFORMATION_TECHNOLOGY)
                 .build();
 
         Department finance = Department.builder()
-                .name("Finance")
+                .name(SeedDepartments.FINANCE)
                 .build();
 
         Department marketing = Department.builder()
-                .name("Marketing")
+                .name(SeedDepartments.MARKETING)
                 .build();
 
         // saveAll runs in a single transaction, so a failure can't leave the table half-seeded
         departmentRepository.saveAll(List.of(hr, it, finance, marketing));
 
-        log.info("Departments seeded successfully.");
+        log.info(LogMessages.DEPARTMENTS_SEEDED);
     }
 
 }

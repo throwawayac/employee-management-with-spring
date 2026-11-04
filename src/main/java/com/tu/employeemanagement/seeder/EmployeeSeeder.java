@@ -6,6 +6,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.ExceptionMessages;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.LogMessages;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.SeedDepartments;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.SeederOrder;
 import com.tu.employeemanagement.model.Department;
 import com.tu.employeemanagement.model.Employee;
 import com.tu.employeemanagement.repository.DepartmentRepository;
@@ -17,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j // for cleaner logging messages to the console during seeding
 @Component
 @RequiredArgsConstructor
-@Order(2) // runs after DepartmentSeeder, which creates the departments used here
+@Order(SeederOrder.EMPLOYEES) // runs after DepartmentSeeder, which creates the departments used here
 public class EmployeeSeeder implements CommandLineRunner {
 
     private final EmployeeRepository employeeRepository;
@@ -27,7 +31,7 @@ public class EmployeeSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         if (employeeRepository.count() > 0) {
-            log.info("Employees already exist. Skipping seeding.");
+            log.info(LogMessages.EMPLOYEES_ALREADY_EXIST);
             return;
         }
 
@@ -38,7 +42,7 @@ public class EmployeeSeeder implements CommandLineRunner {
                 .lastName("Doe")
                 .email("john.doe@example.com")
                 .phoneNumber("+12025550101")
-                .department(findDepartment("Human Resources"))
+                .department(findDepartment(SeedDepartments.HUMAN_RESOURCES))
                 .build();
 
         Employee janeSmith = Employee.builder()
@@ -46,7 +50,7 @@ public class EmployeeSeeder implements CommandLineRunner {
                 .lastName("Smith")
                 .email("jane.smith@example.com")
                 .phoneNumber("+12025550102")
-                .department(findDepartment("Information Technology"))
+                .department(findDepartment(SeedDepartments.INFORMATION_TECHNOLOGY))
                 .build();
 
         Employee aliceJohnson = Employee.builder()
@@ -54,7 +58,7 @@ public class EmployeeSeeder implements CommandLineRunner {
                 .lastName("Johnson")
                 .email("alice.johnson@example.com")
                 .phoneNumber("+12025550103")
-                .department(findDepartment("Finance"))
+                .department(findDepartment(SeedDepartments.FINANCE))
                 .build();
 
         Employee bobBrown = Employee.builder()
@@ -62,18 +66,18 @@ public class EmployeeSeeder implements CommandLineRunner {
                 .lastName("Brown")
                 .email("bob.brown@example.com")
                 .phoneNumber("+12025550104")
-                .department(findDepartment("Marketing"))
+                .department(findDepartment(SeedDepartments.MARKETING))
                 .build();
 
         // saveAll runs in a single transaction, so a failure can't leave the table half-seeded
         employeeRepository.saveAll(List.of(johnDoe, janeSmith, aliceJohnson, bobBrown));
 
-        log.info("Employees seeded successfully.");
+        log.info(LogMessages.EMPLOYEES_SEEDED);
     }
 
     private Department findDepartment(String name) {
         return departmentRepository.findByName(name)
-                .orElseThrow(() -> new IllegalStateException("Cannot seed employees: department '" + name + "' does not exist"));
+                .orElseThrow(() -> new IllegalStateException(ExceptionMessages.SEED_DEPARTMENT_MISSING.formatted(name)));
     }
 
 }

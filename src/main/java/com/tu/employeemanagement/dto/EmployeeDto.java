@@ -4,6 +4,9 @@ import lombok.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.URL;
 
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.ValidationMessages;
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.ValidationRules;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -11,26 +14,28 @@ import org.hibernate.validator.constraints.URL;
 public class EmployeeDto {
     private Long id;
 
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 15, message = "First name must be between 2 and 15 characters")
+    @NotBlank(message = ValidationMessages.FIRST_NAME_REQUIRED)
+    @Size(min = ValidationRules.FIRST_NAME_MIN_LENGTH, max = ValidationRules.FIRST_NAME_MAX_LENGTH,
+            message = ValidationMessages.FIRST_NAME_LENGTH)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 20, message = "Last name must be between 2 and 20 characters")
+    @NotBlank(message = ValidationMessages.LAST_NAME_REQUIRED)
+    @Size(min = ValidationRules.LAST_NAME_MIN_LENGTH, max = ValidationRules.LAST_NAME_MAX_LENGTH,
+            message = ValidationMessages.LAST_NAME_LENGTH)
     private String lastName;
 
-    @Size(max = 255, message = "Profile picture URL is too long")
-    @URL(regexp = "^https?://.*", message = "Profile picture must be a valid http or https URL")
+    @Size(max = ValidationRules.PROFILE_PICTURE_MAX_LENGTH, message = ValidationMessages.PROFILE_PICTURE_TOO_LONG)
+    @URL(regexp = ValidationRules.HTTP_URL_PATTERN, message = ValidationMessages.PROFILE_PICTURE_INVALID)
     private String profilePicture;
 
-    @Pattern(regexp = "^\\+[1-9]\\d{7,14}$", message = "Phone number must be a valid format")
+    @Pattern(regexp = ValidationRules.PHONE_NUMBER_PATTERN, message = ValidationMessages.PHONE_NUMBER_INVALID)
     private String phoneNumber;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
+    @NotBlank(message = ValidationMessages.EMAIL_REQUIRED)
+    @Email(message = ValidationMessages.EMAIL_INVALID)
     private String email;
 
-    @NotNull(message = "Department is required")
+    @NotNull(message = ValidationMessages.DEPARTMENT_REQUIRED)
     private Long departmentId;
 
     private boolean isDeleted;

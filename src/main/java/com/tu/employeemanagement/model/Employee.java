@@ -3,6 +3,8 @@ package com.tu.employeemanagement.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.ValidationRules;
+
 @Builder
 @Entity
 @Table(name = "employees")
@@ -16,16 +18,16 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "first_name", nullable = false, length = 15)
+    @Column(name = "first_name", nullable = false, length = ValidationRules.FIRST_NAME_MAX_LENGTH)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 20)
+    @Column(name = "last_name", nullable = false, length = ValidationRules.LAST_NAME_MAX_LENGTH)
     private String lastName;
 
-    @Column(name = "profile_picture", nullable = true, length = 255)
+    @Column(name = "profile_picture", nullable = true, length = ValidationRules.PROFILE_PICTURE_MAX_LENGTH)
     private String profilePicture;
 
-    @Column(name = "phone_number", nullable = true, unique = true, length = 16)
+    @Column(name = "phone_number", nullable = true, unique = true, length = ValidationRules.PHONE_NUMBER_MAX_LENGTH)
     private String phoneNumber;
 
     @Column(name = "email", nullable = false, unique = true)

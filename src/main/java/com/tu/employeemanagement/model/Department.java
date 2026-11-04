@@ -6,6 +6,8 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.tu.employeemanagement.misc.EmployeeManagementConstants.ValidationRules;
+
 @Builder
 @Entity
 @Table(name = "departments")
@@ -19,7 +21,7 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 30)
+    @Column(name = "name", nullable = false, unique = true, length = ValidationRules.DEPARTMENT_NAME_MAX_LENGTH)
     private String name;
 
     @Builder.Default
